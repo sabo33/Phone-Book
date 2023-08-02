@@ -48,11 +48,20 @@ function App() {
       { id: 3, title: "이강인", body: "01087895648" },
     ];
   });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  
 
   useEffect(() => {
     localStorage.setItem("topics", JSON.stringify(topics));
   }, [topics]);
-
+  
+  useEffect(() => {
+    const filteredResults = topics.filter((person) =>
+      person.title.toLowerCase().includes(searchTerm.toLowerCase()) 
+    );
+    setSearchResults(filteredResults);
+  }, [searchTerm, topics]);
 
   let content = null;
   let contextControl = null;
@@ -120,8 +129,17 @@ function App() {
       <Header title="전화번호부" onChangeMode={() => {
         setMode('WELCOME');
       }}></Header>
-      <Nav topics={topics} onChangeMode={(_id) => {
-        setMode('READ');
+      <input
+        type="text"
+        placeholder="이름 검색"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <Nav topics={searchResults} onChangeMode={(_id) => {
+        if(searchTerm!="")
+          setMode('READ');
+        else
+          setMode('WELCOME');
         setId(_id);
       }}></Nav>
       {content}
